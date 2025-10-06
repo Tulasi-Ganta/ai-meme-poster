@@ -19,7 +19,7 @@ export default function App() {
     setLoading(true);
     try {
       //const res = await fetch("http://localhost:8000/api/generate-caption", {
-      const res = await fetch("https://ai-meme-poster.onrender.com/api/generate-caption", {
+      const res = await fetch("https://ai-meme-poster-2.onrender.com/api/generate-caption", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageDescription: image.name }),
