@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import html2canvas from "html2canvas";
 import "./App.css";
@@ -24,7 +25,6 @@ export default function App() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageDescription: "Generate caption for this image" }),
         }
       );
       const data = await res.json();
@@ -53,15 +53,7 @@ export default function App() {
 
       <div className="buttons">
         <button onClick={generateCaption} disabled={loading}>
-          {loading ?
-          // "Generating..." : "Generate Caption"}
-            (
-              <>
-              Generating <span className="spinner"></span>
-              </>
-            ) : (
-              "Generate Caption"
-            )}
+          {loading ? "Generating..." : "Generate Caption"}
         </button>
         {caption.top && (
           <button onClick={downloadMeme}>Download Meme</button>
