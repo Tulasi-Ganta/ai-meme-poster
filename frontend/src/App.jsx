@@ -18,7 +18,8 @@ export default function App() {
     if (!image) return alert("Please select an image!");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/generate-caption", {
+      //const res = await fetch("http://localhost:8000/api/generate-caption", {
+      const res = await fetch("https://ai-meme-poster.onrender.com/api/generate-caption", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageDescription: image.name }),
