@@ -98,7 +98,7 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Allow CORS from your Netlify frontend
+// ✅ Allow CORS from your frontend
 app.use(cors({
   origin: "https://dashing-boba-9b6a2b.netlify.app",
   methods: ["GET", "POST"]
@@ -106,81 +106,61 @@ app.use(cors({
 
 app.use(express.json());
 
-// -------------------------------
-// AI Caption generator
-// -------------------------------
+// Gemini AI caption generator
 const apiKey = process.env.GEMINI_API_KEY;
 
-const generateCaption = async (imageDescription) => {
+// Generate unique captions for any image
+const generateCaption = async () => {
   try {
-    // If Gemini API is configured
-    if (apiKey) {
-      const response = await axios.post(
-        'https://api.gemini.google.com/v1/generate',
-        {
-          prompt: `You are a funny meme generator. Create a creative and unique top and bottom caption for a meme based on this image description: "${imageDescription}". Return JSON in this format: { "top": "", "bottom": "" }`,
-          model: 'gemini-2.5-flash',
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
+    const response = await axios.post(
+      'https://api.gemini.google.com/v1/generate',
+      {
+        prompt: `Generate two funny meme captions for an image: a top caption and a bottom caption. Return JSON like {"top":"...","bottom":"..."}. Do NOT include filenames in the captions.`,
+        model: 'gemini-2.5-flash'
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
         }
-      );
-
-      // Gemini may return JSON as string
-      let json;
-      try {
-        json = JSON.parse(response.data.output || response.data);
-      } catch {
-        json = { top: "Funny top", bottom: "Funny bottom" };
       }
+    );
 
-      return json;
+    // Parse AI response
+    let json;
+    try {
+      json = JSON.parse(response.data.output || response.data);
+    } catch {
+      json = { top: "Funny top caption", bottom: "Funny bottom caption" };
     }
 
-    // ✅ Fallback: Random captions without image filename
-    const topOptions = [
-      "When life gives you lemons...",
-      "That moment when you realize...",
-      "Everyone's reaction is priceless...",
-      "You won't believe this!",
-      "The funniest thing you'll see today..."
-    ];
-    const bottomOptions = [
-      "And you just can't stop laughing!",
-      "How did this even happen?!",
-      "Absolutely hilarious!",
-      "This made my day!",
-      "Can't believe my eyes!"
-    ];
-
-    const randomTop = topOptions[Math.floor(Math.random() * topOptions.length)];
-    const randomBottom = bottomOptions[Math.floor(Math.random() * bottomOptions.length)];
-
-    return { top: randomTop, bottom: randomBottom };
+    return json;
 
   } catch (err) {
-    console.error('Caption generation error:', err.response?.data || err.message);
-    return { top: "Funny top", bottom: "Funny bottom" };
+    console.error('Gemini error:', err.response?.data || err.message);
+    // fallback random captions
+    const topOptions = [
+      "When life surprises you",
+      "Guess what happens next",
+      "Oops, unexpected!"
+    ];
+    const bottomOptions = [
+      "You won't believe this!",
+      "Absolutely hilarious!",
+      "Can't stop laughing!"
+    ];
+    const randomTop = topOptions[Math.floor(Math.random() * topOptions.length)];
+    const randomBottom = bottomOptions[Math.floor(Math.random() * bottomOptions.length)];
+    return { top: randomTop, bottom: randomBottom };
   }
 };
 
-// -------------------------------
-// Caption API route
-// -------------------------------
+// API route
 app.post('/api/generate-caption', async (req, res) => {
-  // ✅ Ignore filename entirely
-  const { imageDescription } = req.body;
-  const description = imageDescription || "a funny meme image";
-
-  const caption = await generateCaption(description);
+  const caption = await generateCaption();
   res.json(caption);
 });
 
-// -------------------------------
 // Start server
-// -------------------------------
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Backend running on ${PORT}`));
