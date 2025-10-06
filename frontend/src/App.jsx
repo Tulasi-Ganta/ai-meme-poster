@@ -89,7 +89,6 @@
 // }
 
 
-
 import { useState, useRef } from "react";
 import html2canvas from "html2canvas";
 import "./App.css";
@@ -141,26 +140,23 @@ export default function App() {
   return (
     <div className="container">
       <h1>AI Meme & Poster Creator</h1>
+      <input type="file" accept="image/*" onChange={handleImageChange} />
 
-      <div className="upload-section">
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-        <button className="generate-btn" onClick={generateCaption} disabled={loading}>
+      <div className="buttons">
+        <button onClick={generateCaption} disabled={loading}>
           {loading ? "Generating..." : "Generate Caption"}
         </button>
+        {caption.top && (
+          <button onClick={downloadMeme}>Download Meme</button>
+        )}
       </div>
 
       {preview && (
-        <div ref={memeRef} className="meme-preview">
+        <div className="meme" ref={memeRef}>
           <img src={preview} alt="Preview" />
-          <div className="caption top">{caption.top}</div>
-          <div className="caption bottom">{caption.bottom}</div>
+          <div className="top-text">{caption.top}</div>
+          <div className="bottom-text">{caption.bottom}</div>
         </div>
-      )}
-
-      {caption.top && (
-        <button className="download-btn" onClick={downloadMeme}>
-          Download Meme
-        </button>
       )}
     </div>
   );
